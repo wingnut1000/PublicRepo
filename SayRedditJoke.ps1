@@ -59,8 +59,11 @@ Function SayRedditJoke{
     $joke = Find-ShortJoke $jokes -length $wordLength
     if(!$joke){Write-Host "No joke found"}
 
-    Write-Host "Category : "$category" `nMax Joke length : $wordLength `nJoke Length : "  $($($joke.title | Measure-Object -Word | Select-Object -ExpandProperty Words) + $($joke.selftext | Measure-Object -Word | Select-Object -ExpandProperty Words)) "words" "`nUrl : $($joke.url)"
-    Say "From Reddit R / $subreddit category $category"
+    Write-Host "Subreddit : $subreddit"
+    Write-Host "Category : $category"
+    Write-Host "Max Joke length : $wordLength"
+    Write-Host "Joke Length : "  $($($joke.title | Measure-Object -Word | Select-Object -ExpandProperty Words) + $($joke.selftext | Measure-Object -Word | Select-Object -ExpandProperty Words)) "words" 
+    Write-Host "Url : $($joke.url)"
     Say $joke.title
     Say $joke.selftext
 }
