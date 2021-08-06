@@ -8,6 +8,21 @@ Function Say($lines){
     }
 }
 
+Function Get-RedditPosts{
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]
+        $category = 'hot',
+        [Parameter(Mandatory=$true)]
+        [string]
+        $subreddit
+    )
+    $category = $category.ToLower()
+    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json
+    $posts = ($jsonresponse.content | ConvertFrom-Json).data.children.data
+    return $posts
+} 
+
 Function Get-RedditJokes{
     param(
         [Parameter(Mandatory=$true)]
@@ -19,9 +34,7 @@ Function Get-RedditJokes{
         [string]
         $subreddit='jokes'
     )
-    $category = $category.ToLower()
-    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json
-    $jokes = ($jsonresponse.content | ConvertFrom-Json).data.children.data | Select-Object title,selftext,url
+    Get-RedditPosts -subreddit $subreddit -category $category
     return $jokes
 }
 
