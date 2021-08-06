@@ -56,4 +56,4 @@ Function SayRedditJoke{
     Say $joke.selftext
 }
 
-SayRedditJoke -category Best
+SayRedditJoke -category top
