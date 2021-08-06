@@ -13,10 +13,14 @@ Function Get-RedditJokes{
         [Parameter(Mandatory=$true)]
         [ValidateSet('hot','top','best','new')]
         [string]
-        $category
+        $category,
+        [Parameter(Mandatory=$false)]
+        [ValidateSet('jokes','dadjokes')]
+        [string]
+        $subreddit='jokes'
     )
     $category = $category.ToLower()
-    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/jokes/$category/.json
+    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json
     $jokes = ($jsonresponse.content | ConvertFrom-Json).data.children.data | Select-Object title,selftext,url
     return $jokes
 }
@@ -43,17 +47,22 @@ Function SayRedditJoke{
         [Parameter(Mandatory=$false)]
         [ValidateSet('hot','top','best','new')]
         [string]
-        $category='top'
+        $category='top',
+        [Parameter(Mandatory=$false)]
+        [ValidateSet('jokes','dadjokes')]
+        [string]
+        $subreddit='jokes'
     )
+
     $wordLength = '30'
-    $jokes = Get-RedditJokes -category $category
+    $jokes = Get-RedditJokes -category $category -subreddit $subreddit
     $joke = Find-ShortJoke $jokes -length $wordLength
     if(!$joke){Write-Host "No joke found"}
 
     Write-Host "Category : "$category" `nMax Joke length : $wordLength `nJoke Length : "  $($($joke.title | Measure-Object -Word | Select-Object -ExpandProperty Words) + $($joke.selftext | Measure-Object -Word | Select-Object -ExpandProperty Words)) "words" "`nUrl : $($joke.url)"
-    Say "From Reddit Jokes Category $category"
+    Say "From Reddit R / $subreddit category $category"
     Say $joke.title
     Say $joke.selftext
 }
 
-SayRedditJoke -category top
+SayRedditJoke -category top -subreddit dadjokes
