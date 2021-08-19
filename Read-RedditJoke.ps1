@@ -20,10 +20,13 @@ Function Read-Lines{
         $voice = 'Microsoft Zira Desktop'
     )
 
-
+    #Add requires speech synthesizer assembly
     Add-Type -AssemblyName System.speech
+    #Define new speek object
     $speak = New-Object System.Speech.Synthesis.SpeechSynthesizer
+    #Define voice
     $speak.SelectVoice($voice)
+    #Call assembly to read text
     foreach($line in $lines){
         $speak.Speak($line)
     }
