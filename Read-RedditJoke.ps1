@@ -56,8 +56,11 @@ Function Get-RedditPosts{
         [string]
         $subreddit
     )
+    #Case seems to effect webrequest.  Set to lower case
     $category = $category.ToLower()
+    #Web request to reddit expecting JSON format response
     $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json
+    #Get posts in response
     $posts = ($jsonresponse.content | ConvertFrom-Json).data.children.data
     return $posts
 } 
@@ -108,7 +111,9 @@ Function Find-ShortJoke{
         [Parameter(Mandatory=$false)]
         $length = 30
     )
+    #Define arrary to store jokes within the specified word count
     $shortJokes = @()
+    #Iterate through provided jokes.  Add jokes within defined paramaters to array
     foreach($joke in $jokes){
         $titleWordCount = $joke.title | Measure-Object -Word | Select-Object -ExpandProperty Words
         $selftextWordCount = $joke.selftext | Measure-Object -Word | Select-Object -ExpandProperty Words
@@ -116,6 +121,7 @@ Function Find-ShortJoke{
             $shortJokes += $joke
         }
     }
+    #Return random joke in array
     return $(Get-Random $shortJokes)
 }
 
@@ -192,4 +198,4 @@ Function Read-RedditJoke{
 }
 
 #Call main function
-Read-RedditJoke -category top -subreddit dadjokes
+Read-RedditJoke
