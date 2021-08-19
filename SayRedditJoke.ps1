@@ -4,7 +4,7 @@ Function Read-Lines{
     Speaks provided text via Windows speech synthesizer
     
     .DESCRIPTION
-    Speaks provided text via Windows speech synthesizer.  Voice is 'Microsoft Zira Desktop'.
+    Speaks provided text via Windows speech synthesizer.  Default voice is 'Microsoft Zira Desktop'.  No check for required assembly currently implimented.
     
     .PARAMETER lines
     Designated text to speak. Accepts array.
