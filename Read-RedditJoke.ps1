@@ -78,7 +78,7 @@ Function Get-RedditJokes{
     Default category is HOT
 
     .PARAMETER subreddit
-    Designate subreddit to retrieve posts  Available subreddits are JOKES, DADJOKES
+    Designate subreddit to retrieve posts
     #>
     param(
         [Parameter(Mandatory=$false)]
@@ -86,7 +86,6 @@ Function Get-RedditJokes{
         [string]
         $category='hot',
         [Parameter(Mandatory=$false)]
-        [ValidateSet('jokes','dadjokes')]
         [string]
         $subreddit='jokes'
     )
@@ -131,7 +130,8 @@ Function Read-RedditJoke{
     Main function.  Read a random joke from reddit
     
     .DESCRIPTION
-    Main function.  Retrieves a random joke from a subreddit and utilizes the Windows speech synthesizer to audibly read joke.  No caching mechanism has been implimented so repeat jokes may occur.
+    Main function.  Retrieves a random joke from a subreddit and utilizes the Windows speech synthesizer to audibly read joke.  Reads title and selftext of post
+    No caching mechanism has been implimented so repeat jokes may occur.
     There is no content filter capability so jokes may be NSFW.  Use at your own risk.
     
 
@@ -140,7 +140,8 @@ Function Read-RedditJoke{
     Default category is HOT
 
     .PARAMETER subreddit
-    Designate subreddit to retrieve posts  Available subreddits are JOKES, DADJOKES
+    Designate predefined subreddit to retrieve posts.  Random will pull from random joke related subreddit.  Limited set of subreddits are permitted to to formatting constraints.
+    Many joke related subreddits are not text based, will need to impliment logic to exclude non text based posts.
 
     .PARAMETER wordLength
     Specify maximum number of words allowed in a post.  Combines total word count of setup and punchline.
@@ -155,14 +156,28 @@ Function Read-RedditJoke{
         [string]
         $category='top',
         [Parameter(Mandatory=$false)]
-        [ValidateSet('jokes','dadjokes')]
         [string]
-        $subreddit='jokes',
+        $subreddit='random',
         [Parameter(Mandatory=$false)]
         $wordLength = 30,
         [Parameter(Mandatory=$false)]
         [bool]$noText = $false
     )
+    
+    #Have not yet found a method that would allow me to define a list in a validate parameter set.  Want to have one spot to update available subreddits so I'll use a list and if statements to get desired outcome for now.
+    #Define list of available subreddits
+    $subredditList = @('jokes','dadjokes','oneliners','cleanjokes')
+    #If random was provided, get random subreddit from list
+    if($subreddit -eq 'random'){
+        $subreddit = Get-Random $subredditList
+    }else{
+        #Evaluate if reddit is on available subreddit list
+        if($subredditList -notcontains $subreddit){
+            Write-Host "Subreddit not available"
+            return
+        }
+    }
+    
 
     #Retrieve list of jokes from reddit
     $jokes = Get-RedditJokes -category $category -subreddit $subreddit
@@ -172,7 +187,9 @@ Function Read-RedditJoke{
 
     #No reddit joke found within the specified parameters
     if(!$joke){
-        Write-Host "No joke found" -ForegroundColor RED
+        #Call main function again for another attempt.  May cause infinate loop.
+        Write-Host "No joke found, trying again..." -ForegroundColor Yellow
+        Read-RedditJoke -category $category -subreddit $subreddit -wordLength $wordLength
         return
     }
 
