@@ -59,7 +59,7 @@ Function Get-RedditPosts{
     #Case seems to effect webrequest.  Set to lower case
     $category = $category.ToLower()
     #Web request to reddit expecting JSON format response
-    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json
+    $jsonresponse = Invoke-WebRequest -Uri reddit.com/r/$subreddit/$category/.json -UseBasicParsing
     #Get posts in response
     $posts = ($jsonresponse.content | ConvertFrom-Json).data.children.data
     return $posts
